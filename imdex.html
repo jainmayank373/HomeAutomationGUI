@@ -1,0 +1,137 @@
+<html>
+<head>
+    <style>
+        body,html{
+            background-color: lightgray;
+        }
+        .container {
+	height: 10px;
+	width: 103px;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+}
+                .toggle-btn{
+                    background-color: white;
+                    border:1p solid black;
+                    border-radius: 50px;
+                    display: flex;
+                    width:100px;
+                    
+                }
+                .inner-circle{
+                    background-color:grey;
+                    height: 36px;
+                    width: 36px;
+                    border-radius: 50%;
+                    display: flex;
+                    box-shadow: 2px 2px 10px 0px;
+                }
+                .typo{
+                  
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	text-align: center;
+
+
+                }
+         </style>
+</head>
+<body>
+        <div class="typo">
+                <h1>SMART HOME AUTOMATION</h1>
+                <h3>JUET</div>
+        </div>
+		<div class="container">
+                <div class="toggle-btn">
+                    <div class="inner-circle"></div>
+                </div>
+        
+                <div >
+                    <h3 id="state">OFF</h3>
+                </div>
+        </div>
+        
+</body>
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.6.js"></script>
+
+
+	<script>
+(function(){
+    var logicState = '0';
+
+            var innerCircle =  document.getElementsByClassName("inner-circle");
+            var toggleBtn = document.getElementsByClassName('toggle-btn');
+            var state =  document.getElementById('state');
+            var elem =  innerCircle[0];
+            innerCircle[0].addEventListener('click',()=>{
+                    if( elem.style.backgroundColor == "rgb(255, 68, 180)"){
+                         elem.style.backgroundColor ="grey";
+                         logicState = '0';
+                         state.innerHTML ="OFF";
+                         toggleBtn[0].style.flexDirection="row";
+                         toggleBtn[0].style.backgroundColor ="white";
+                        
+
+                         publish();
+                         return;
+                    }
+                    else{
+                                            elem.style.backgroundColor="#ff44b4";
+                                            logicState = '1';
+                                            state.innerHTML ="ON";
+                                            toggleBtn[0].style.flexDirection="row-reverse";
+                                            toggleBtn[0].style.backgroundColor =" #ff44b4";
+                                            publish();
+                                            return;
+                    }
+            })
+            
+
+			function publish() {
+   
+    pubnub = new PubNub({
+        publishKey : 'pub-c-35890ac5-a7b7-4cc7-b3ba-2c59530ab8c5',
+        subscribeKey : 'sub-c-d8252984-5164-11e8-a697-1afc57e8b539'
+    })
+       
+    function publishSampleMessage() {
+       
+        var publishConfig = {
+            channel : "Demo",
+            message: { 
+               f:logicState,
+                description: "Love world!"
+            }
+        }
+        pubnub.publish(publishConfig, function(status, response) {
+           
+        })
+    }
+       
+    pubnub.addListener({
+        status: function(statusEvent) {
+            if (statusEvent.category === "PNConnectedCategory") {
+                publishSampleMessage();
+            }
+        },
+        message: function(msg) {
+
+        },
+        presence: function(presenceEvent) {
+         
+        }
+    })      
+    pubnub.subscribe({
+        channels: ['Demo'] 
+    });
+};
+
+
+})();
+
+	</script>
+</html>
